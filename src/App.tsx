@@ -1,13 +1,13 @@
 import React, { Component, useState, useEffect } from 'react';
 import * as io from 'socket.io-client';
 import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 
 export function Members(props: any) {
     const tempUsername = Math.random().toString(36).substring(7)
     const [members, setMembers] = useState<string[]>([])
     const [username, setUsername] = useState<string>(tempUsername)
-    const [socket, updateSocket]  = useState()
+    const [socket, setSocket]  = useState()
 
     function addUser(user: string) {
         setMembers(oldMembers => [...oldMembers, user])
@@ -30,9 +30,20 @@ export function Members(props: any) {
       console.log('setting current members')
       setMembers(users)
     }
+    
+    function handleKeyEvent(event: KeyboardEvent) {
+        console.log(event)
+        socket.emit('keyEvent', event.key);
+    }
 
-    useEffect(function() {
+    useEffect(() => {
+      document.addEventListener('keydown', handleKeyEvent)
+      return function(){ document.removeEventListener('keydown', handleKeyEvent)}
+    })
+
+    useEffect(()  => {
       const socket = io.connect('http://localhost:50824')
+      setSocket(socket)
       socket.emit('whoami', {username})
       socket.on('user_connected', addUser)
       socket.on('user_disconnected', removeUser)
@@ -49,7 +60,9 @@ export function Members(props: any) {
             })}
           </div>
         </div>
-        <h1>Logged in as { username }</h1>
+        <div id="identity">
+          <h1>Logged in as { username }</h1>
+        </div>
       </div>
     ) 
 

@@ -1,3 +1,5 @@
+@import "node_modules/nord/src/sass/nord.scss";
+
 #wrapper{
   display: flex;
   flex-direction: row;
@@ -29,10 +31,16 @@
   display: flex;
   border: solid;
   border-width: 1px;
-  border-color: lightslategrey;
+  border-color: $nord6;
+  background-color: $nord2;
   border-radius: 10px;
   margin: 5px;
 }
 .member_row:hover{
   margin-left: 15px;
+}
+#identity{
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
