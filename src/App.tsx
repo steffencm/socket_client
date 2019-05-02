@@ -1,12 +1,18 @@
-import React, { Component, useState, useEffect } from 'react';
-import * as io from 'socket.io-client';
-import logo from './logo.svg';
-import './App.scss';
+import React, { useState, useEffect } from 'react'
+import { Members } from './Members'
+import { User, Identity } from './Identity'
+import { Canvas } from './Canvas'
+import * as io from 'socket.io-client'
+import './App.scss'
 
-export function Members(props: any) {
+export default function App(props: any) {
+  
     const tempUsername = Math.random().toString(36).substring(7)
     const [members, setMembers] = useState<string[]>([])
-    const [username, setUsername] = useState<string>(tempUsername)
+    const [user, setUser] = useState<User>({
+      userName: tempUsername
+    })
+    
     const [socket, setSocket]  = useState()
 
     function addUser(user: string) {
@@ -26,6 +32,7 @@ export function Members(props: any) {
         return oldMembers
       })
     }
+
     function setCurrentMembers(users: string[]){
       console.log('setting current members')
       setMembers(users)
@@ -44,7 +51,7 @@ export function Members(props: any) {
     useEffect(()  => {
       const socket = io.connect('http://localhost:50824')
       setSocket(socket)
-      socket.emit('whoami', {username})
+      socket.emit('whoami', {username: user.userName})
       socket.on('user_connected', addUser)
       socket.on('user_disconnected', removeUser)
       socket.on('current_users', setCurrentMembers)
@@ -52,29 +59,13 @@ export function Members(props: any) {
 
     return (
       <div id="wrapper">
-        <div id="members">
-          <span id="members_title">Current Members</span>
-          <div id="members_list">
-            {members.map((value, index) => {
-              return <div className="member_row">{value}</div>
-            })}
-          </div>
+        <div className="App">
+          <Members members={members}/>
         </div>
-        <div id="identity">
-          <h1>Logged in as { username }</h1>
-        </div>
-      </div>
-    ) 
-
-}
-
-export default function App(props: any) {
-
-
-    return (
-      <div className="App">
-        <Members />
+        <Identity user={user} />
+        <Canvas members={members}/>
       </div>
     )
+
   }
 
